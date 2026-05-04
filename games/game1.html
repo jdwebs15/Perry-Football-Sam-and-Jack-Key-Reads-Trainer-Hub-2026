@@ -41,7 +41,7 @@ svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index
 .ball-line{stroke:var(--purple);stroke-width:5;fill:none;stroke-dasharray:8 7;stroke-linecap:round;marker-end:url(#arrowPurple)}
 .sam-line{stroke:var(--yellow);stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowYellow)}
 .jack-line{stroke:var(--blue);stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowBlue)}
-.draw{stroke-dasharray:700;stroke-dashoffset:700;animation:drawLine 1.2s ease forwards}
+.draw{stroke-dasharray:900;stroke-dashoffset:900;animation:drawLine 1.25s ease forwards}
 @keyframes drawLine{to{stroke-dashoffset:0}}
 .question-card{margin-top:16px;padding:18px;border-radius:18px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.055);text-align:center}
 .scenario-title{color:var(--yellow);font-weight:900;text-transform:uppercase;margin-bottom:8px}
@@ -49,7 +49,7 @@ svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index
 .choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:1000px;margin:0 auto}
 button{min-height:66px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:#34495e;color:white;font-weight:900;cursor:pointer;padding:10px;line-height:1.25}
 button:hover{filter:brightness(1.12)}
-button:disabled{opacity:.55}
+button:disabled{opacity:.55;cursor:not-allowed}
 .feedback{min-height:84px;margin-top:14px;font-weight:800;line-height:1.45;color:var(--muted)}
 .correct{color:var(--green)}
 .incorrect{color:#ff8a8a}
@@ -65,7 +65,7 @@ button:disabled{opacity:.55}
   <div class="kicker">Legend Mastery Series • Sam & Jack Trainer</div>
   <h1>Game 1 — Block Read Reaction Trainer</h1>
   <p class="sub">
-    Read the block shown to Sam and Jack. Both sides are labeled first. Sam/Jack reaction lines appear only after the correct answer.
+    Read the block shown to Sam and Jack. Both sides are labeled first. Reaction lines appear only after the correct answer.
   </p>
 </header>
 
@@ -117,23 +117,23 @@ const field = document.getElementById("field");
 const svg = document.getElementById("svg");
 
 const scenarios = [
-  makeScenario("UNDER", "RIP", "Under Rip — Jack Down With Puller", "Down + Puller", "Base / Gap-Hinge", "spill", "slowCutback"),
-  makeScenario("UNDER", "LIZ", "Under Liz — Jack Down Without Puller", "Down — No Puller", "Zone Away", "squeezeQB", "slowCutback"),
-  makeScenario("UNDER", "RIP", "Under Rip — Jack Base/Out", "Base / Out", "Pull Away", "setEdge", "slowCutback"),
-  makeScenario("UNDER", "LIZ", "Under Liz — Jack Zone", "Zone", "Base / Out", "squeezeQB", "setEdge"),
-  makeScenario("UNDER", "RIP", "Under Rip — Jack High Hat", "High Hat", "High Hat", "containRush", "coverage"),
-  makeScenario("UNDER", "LIZ", "Under Liz — Sam Base/Out", "Zone Away", "Base / Out", "slowCutback", "setEdge"),
-  makeScenario("UNDER", "RIP", "Under Rip — Sam Down With Puller", "Base / Out", "Down + Puller", "setEdge", "box"),
-  makeScenario("UNDER", "LIZ", "Under Liz — Sam High Hat / Jack High Hat", "High Hat", "High Hat", "containRush", "coverage"),
+  S("UNDER","RIP","Under Rip — Jack Down With Puller","Down + Puller","Base / Gap-Hinge","jackSpillB","samCutback"),
+  S("UNDER","LIZ","Under Liz — Jack Down No Puller","Down — No Puller","Zone Away","jackQB","samCutback"),
+  S("UNDER","RIP","Under Rip — Jack Base/Out","Base / Out","Pull Away","jackBaseLOS","samCutback"),
+  S("UNDER","LIZ","Under Liz — Jack Zone","Zone","Base / Gap-Hinge","jackZoneLOS","samCutback"),
+  S("UNDER","RIP","Under Rip — High Hat","High Hat","High Hat","jackContainRush","samCoverage"),
+  S("UNDER","LIZ","Under Liz — Sam Base/Out","Zone Away","Base / Out","jackQB","samCutback"),
+  S("UNDER","RIP","Under Rip — Sam Down With Puller","Base / Out","Down + Puller","jackBaseLOS","samBox"),
+  S("UNDER","LIZ","Under Liz — Sam High Hat","High Hat","High Hat","jackContainRush","samCoverage"),
 
-  makeScenario("OKIE", "RIP", "Okie Rip — Jack Down With Puller", "Down + Puller", "Base / Out", "box", "slowCutback"),
-  makeScenario("OKIE", "LIZ", "Okie Liz — Jack Down Without Puller", "Down — No Puller", "Zone Away", "lateContain", "slowCutback"),
-  makeScenario("OKIE", "RIP", "Okie Rip — Jack Zone To Him", "Zone", "Pull Away", "boxQB", "slowCutback"),
-  makeScenario("OKIE", "LIZ", "Okie Liz — Jack Base/Out", "Base / Out", "Zone Away", "setEdge", "slowCutback"),
-  makeScenario("OKIE", "RIP", "Okie Rip — Sam Down With Puller", "Zone Away", "Down + Puller", "slowCutback", "box"),
-  makeScenario("OKIE", "LIZ", "Okie Liz — Sam Zone To Him", "Base / Out", "Zone", "setEdge", "forceBounce"),
-  makeScenario("OKIE", "RIP", "Okie Rip — Sam High Hat / Jack High Hat", "High Hat", "High Hat", "coverage", "coverage"),
-  makeScenario("OKIE", "LIZ", "Okie Liz — Jack Ball Away / No C-Gap Player", "Zone Away", "Down — No Puller", "lateContain", "slowCutback")
+  S("OKIE","RIP","Okie Rip — Jack Down With Puller","Down + Puller","Base / Out","jackBoxOff","samCutback"),
+  S("OKIE","LIZ","Okie Liz — Jack Down No Puller","Down — No Puller","Zone Away","jackLateContain","samCutback"),
+  S("OKIE","RIP","Okie Rip — Jack Zone To Him","Zone","Pull Away","jackBoxQB","samCutback"),
+  S("OKIE","LIZ","Okie Liz — Jack Base/Out","Base / Out","Zone Away","jackSetEdge","samCutback"),
+  S("OKIE","RIP","Okie Rip — Sam Down With Puller","Zone Away","Down + Puller","jackLateContain","samBox"),
+  S("OKIE","LIZ","Okie Liz — Sam Zone To Him","Base / Out","Zone","jackSetEdge","samForceBounce"),
+  S("OKIE","RIP","Okie Rip — High Hat","High Hat","High Hat","jackCoverage","samCoverage"),
+  S("OKIE","LIZ","Okie Liz — Jack Ball Away / No C-Gap","Zone Away","Down — No Puller","jackLateContain","samCutback")
 ];
 
 let order = [];
@@ -142,7 +142,7 @@ let correct = 0;
 let attempts = 0;
 let locked = false;
 
-function makeScenario(front, strength, title, jackBlock, samBlock, jackReaction, samReaction) {
+function S(front,strength,title,jackBlock,samBlock,jackReaction,samReaction){
   return {
     front,
     strength,
@@ -151,29 +151,49 @@ function makeScenario(front, strength, title, jackBlock, samBlock, jackReaction,
     samBlock,
     jackReaction,
     samReaction,
-    correct: reactionText(jackReaction, samReaction),
-    question: `Jack gets ${jackBlock}. Sam gets ${samBlock}. What should both players do?`
+    correct:`Jack: ${shortLabel(jackReaction)} | Sam: ${shortLabel(samReaction)}`,
+    question:`Jack gets ${jackBlock}. Sam gets ${samBlock}. What should both players do?`
   };
 }
 
-function reactionText(jackReaction, samReaction) {
-  return `Jack: ${reactionLabel(jackReaction)} | Sam: ${reactionLabel(samReaction)}`;
+function shortLabel(r){
+  const m = {
+    jackSpillB:"spill flat, then vertical B-gap",
+    jackQB:"squeeze and play QB leverage",
+    jackBaseLOS:"base lockout, square, sit gap",
+    jackZoneLOS:"hands, vertical key, set edge",
+    jackContainRush:"contain rush, QB depth rule",
+    jackBoxOff:"box kickout at leverage point",
+    jackLateContain:"hold leverage, late contain",
+    jackBoxQB:"box ball inside, QB point",
+    jackSetEdge:"set edge at leverage point",
+    jackCoverage:"step LOS, open to coverage",
+    samCutback:"read, confirm away, slow cutback",
+    samCoverage:"step LOS, open to coverage",
+    samBox:"box kickout at leverage point",
+    samForceBounce:"hold bounce, then B cutback"
+  };
+  return m[r];
 }
 
-function reactionLabel(r) {
-  const map = {
-    spill: "flatten, wrong-arm/spill, then turn vertical into B-gap",
-    squeezeQB: "squeeze, stay square, play QB/outside leverage, do not chase give",
-    setEdge: "attack leverage point just outside OT, set hard edge, keep outside arm free",
-    containRush: "short first step, convert to contain rush, never past QB depth",
-    coverage: "short step to LOS, open, then gain depth into coverage",
-    box: "attack leverage point just outside OT, box kickout, force ball back inside",
-    slowCutback: "read steps, confirm ball away, slow cutback with square shoulders",
-    lateContain: "hold leverage, late pursuit/contain for boot, reverse, QB pull",
-    boxQB: "box ball back inside and play inside point of QB",
-    forceBounce: "maintain outside leverage and force bounce/edge fit"
+function longExplain(r, who){
+  const m = {
+    jackSpillB:`${who}: tackle blocks down, backside guard pulls flat behind the LOS. Flatten under the puller line, wrong-arm/spill, then cross vertical into the backfield in B-gap.`,
+    jackQB:`${who}: down with no puller from the LOS means squeeze, stay square, and play leverage on the QB. Do not chase the give.`,
+    jackBaseLOS:`${who}: base/out on the LOS means inside hand to center chest, outside hand to shoulder, half-man leverage, lock out, square, and sit in the assigned gap.`,
+    jackZoneLOS:`${who}: zone on the LOS means hands like base, work the key vertical, set the edge with the key’s body, and keep outside leverage.`,
+    jackContainRush:`${who}: high hat on the LOS means contain rush. Rush through your gap, keep outside shoulder, and never run past QB depth.`,
+    jackBoxOff:`${who}: off the ball with down/puller means win to the leverage point just outside the OT, box the kickout, and force the ball back inside.`,
+    jackLateContain:`${who}: no C-gap player to your side means do not cut back. Hold leverage for reverse, boot, broken play, or QB pull.`,
+    jackBoxQB:`${who}: off-ball zone/read side means box the ball back inside and play the inside point of the QB.`,
+    jackSetEdge:`${who}: base/out off the ball means attack the leverage point just outside the OT, set a hard edge, and keep outside arm free.`,
+    jackCoverage:`${who}: high hat off the ball means short step to the LOS, open, then gain depth into coverage.`,
+    samCutback:`${who}: with a 5-tech to your side, read your key, confirm ball away, stay square, and slow cutback into B-gap.`,
+    samCoverage:`${who}: high hat off the ball means short step toward the LOS, open, then gain depth into coverage.`,
+    samBox:`${who}: down/puller to you off the ball means win to the leverage point just outside the OT, box the kickout, and force the ball back inside.`,
+    samForceBounce:`${who}: zone/base flow to you means hold for bounce, then work square into B-gap cutback as the ball declares.`
   };
-  return map[r];
+  return m[r];
 }
 
 function shuffle(arr){
@@ -280,26 +300,30 @@ function drawOkie(rip){
   addPlayer("FS",820,485,"def");
 }
 
-function positions(s){
+function P(s){
   const rip = s.strength === "RIP";
   if(rip){
     return {
-      jackOT:{x:390,y:260,dir:-1}, samOT:{x:790,y:260,dir:1},
+      jackOT:{x:390,y:260,dir:-1,side:"left"},
+      samOT:{x:790,y:260,dir:1,side:"right"},
       jack:{x:s.front==="UNDER"?355:270,y:s.front==="UNDER"?305:370},
       sam:{x:910,y:370},
-      jackEdge:{x:350,y:255}, samEdge:{x:875,y:255}
+      jackEdge:{x:350,y:255},
+      samEdge:{x:875,y:255}
     };
   }
   return {
-    jackOT:{x:790,y:260,dir:1}, samOT:{x:390,y:260,dir:-1},
+    jackOT:{x:790,y:260,dir:1,side:"right"},
+    samOT:{x:390,y:260,dir:-1,side:"left"},
     jack:{x:s.front==="UNDER"?825:910,y:s.front==="UNDER"?305:370},
     sam:{x:270,y:370},
-    jackEdge:{x:830,y:255}, samEdge:{x:305,y:255}
+    jackEdge:{x:830,y:255},
+    samEdge:{x:305,y:255}
   };
 }
 
 function drawBlocks(s){
-  const p = positions(s);
+  const p = P(s);
   drawBlockAt(p.jackOT, s.jackBlock, "Jack key: " + s.jackBlock);
   drawBlockAt(p.samOT, s.samBlock, "Sam key: " + s.samBlock);
   path(590,105, s.strength==="RIP" ? 405 : 775, 165, "ball-line");
@@ -307,25 +331,52 @@ function drawBlocks(s){
 
 function drawBlockAt(key, block, text){
   const d = key.dir;
+
   if(block === "Down + Puller"){
     path(key.x,key.y,key.x-d*72,key.y+10,"block-line");
-    path(key.x + d*80,key.y,key.x-d*55,key.y+62,"block-line");
-  } else if(block === "Down — No Puller"){
+
+    if(key.side === "left"){
+      path(710,260,650,286,"block-line");
+      path(650,286,515,286,"block-line");
+      path(515,286,330,286,"block-line");
+      label("Backside Guard Pulls Flat",520,306,"read-label");
+    } else {
+      path(470,260,530,286,"block-line");
+      path(530,286,665,286,"block-line");
+      path(665,286,850,286,"block-line");
+      label("Backside Guard Pulls Flat",665,306,"read-label");
+    }
+  }
+
+  if(block === "Down — No Puller"){
     path(key.x,key.y,key.x-d*75,key.y+10,"block-line");
-  } else if(block === "Zone"){
+  }
+
+  if(block === "Zone"){
     path(key.x,key.y,key.x+d*58,key.y-8,"block-line");
-  } else if(block === "Zone Away"){
+  }
+
+  if(block === "Zone Away"){
     path(key.x,key.y,key.x-d*55,key.y-6,"block-line");
-  } else if(block === "Base / Out"){
+  }
+
+  if(block === "Base / Out"){
     path(key.x,key.y,key.x+d*68,key.y+4,"block-line");
-  } else if(block === "Pull Away"){
+  }
+
+  if(block === "Pull Away"){
     path(key.x,key.y,key.x-d*130,key.y+18,"block-line");
-  } else if(block === "High Hat"){
+  }
+
+  if(block === "High Hat"){
     path(key.x,key.y,key.x,key.y-62,"block-line");
-  } else if(block === "Base / Gap-Hinge"){
+  }
+
+  if(block === "Base / Gap-Hinge"){
     path(key.x,key.y,key.x+d*45,key.y+4,"block-line");
     path(key.x+d*45,key.y+4,key.x+d*78,key.y+28,"block-line");
   }
+
   label(text, key.x + d*88, key.y-34, "read-label");
 }
 
@@ -335,9 +386,9 @@ function renderChoices(s){
 
   const choices = shuffle([
     s.correct,
-    "Jack: wrong-arm/spill every block | Sam: blitz C-gap",
-    "Jack: chase the RB immediately | Sam: drop straight back",
-    "Jack: widen outside the TE | Sam: run over the top fast"
+    "Jack: chase RB now | Sam: drop straight back",
+    "Jack: widen outside TE | Sam: run over top fast",
+    "Jack: wrong-arm all blocks | Sam: blitz C-gap"
   ]);
 
   choices.forEach(choice=>{
@@ -354,7 +405,7 @@ function submitAnswer(choice, s){
 
   if(choice !== s.correct){
     document.getElementById("feedback").className = "feedback incorrect";
-    document.getElementById("feedback").textContent = "Not yet. Read the label on each side first: Jack’s block and Sam’s block tell them what to do.";
+    document.getElementById("feedback").textContent = "Not yet. Option A rule: no reaction lines until the correct answer is selected.";
     updateAccuracy();
     return;
   }
@@ -367,7 +418,7 @@ function submitAnswer(choice, s){
 
   const fb = document.getElementById("feedback");
   fb.className = "feedback correct";
-  fb.textContent = explain(s);
+  fb.textContent = `${longExplain(s.jackReaction,"Jack")} ${longExplain(s.samReaction,"Sam")}`;
 
   updateAccuracy();
 
@@ -375,11 +426,11 @@ function submitAnswer(choice, s){
     current++;
     if(current >= order.length) endGame();
     else loadScenario();
-  }, 6500);
+  }, 7500);
 }
 
 function drawReactions(s){
-  const p = positions(s);
+  const p = P(s);
   drawReaction("jack", p.jack, p.jackEdge, s.jackReaction);
   drawReaction("sam", p.sam, p.samEdge, s.samReaction);
 }
@@ -387,56 +438,83 @@ function drawReactions(s){
 function drawReaction(who, start, edge, reaction){
   const cls = who === "jack" ? "jack-line draw" : "sam-line draw";
   const name = who === "jack" ? "Jack" : "Sam";
+  const dir = edge.x > start.x ? 1 : -1;
 
-  if(reaction === "setEdge" || reaction === "box" || reaction === "forceBounce"){
+  if(reaction === "jackSpillB"){
+    const flatY = 315;
+    const crossX = edge.x + (dir * 42);
+    path(start.x,start.y,crossX,flatY,cls);
+    path(crossX,flatY,crossX,232,cls);
+    label(`${name}: flat under puller → vertical B`,crossX,216,"read-label");
+  }
+
+  if(reaction === "jackQB"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    label(`${name}: leverage point / set edge`,edge.x,edge.y-25,"read-label");
+    path(edge.x,edge.y,edge.x-dir*36,edge.y-42,cls);
+    label(`${name}: squeeze / QB leverage`,edge.x,edge.y-60,"read-label");
   }
 
-  if(reaction === "spill"){
-    path(start.x,start.y,start.x + (edge.x>start.x?55:-55),start.y,""+cls);
-    path(start.x + (edge.x>start.x?55:-55),start.y,edge.x,edge.y,""+cls);
-    path(edge.x,edge.y,edge.x,edge.y-58,""+cls);
-    label(`${name}: spill → vertical B`,edge.x,edge.y-74,"read-label");
-  }
-
-  if(reaction === "squeezeQB"){
+  if(reaction === "jackBaseLOS"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    path(edge.x,edge.y,edge.x + (edge.x>590?-35:35),edge.y-38,cls);
-    label(`${name}: squeeze / QB leverage`,edge.x,edge.y-56,"read-label");
+    label(`${name}: lockout / square / sit gap`,edge.x,edge.y-30,"read-label");
   }
 
-  if(reaction === "slowCutback"){
-    path(start.x,start.y,start.x + (start.x>590?-55:55),start.y-15,cls);
-    label(`${name}: slow cutback`,start.x + (start.x>590?-70:70),start.y-35,"read-label");
-  }
-
-  if(reaction === "lateContain"){
-    path(start.x,start.y,start.x + (start.x>590?-22:22),start.y-34,cls);
-    label(`${name}: hold / late contain`,start.x + (start.x>590?-35:35),start.y-55,"read-label");
-  }
-
-  if(reaction === "boxQB"){
+  if(reaction === "jackZoneLOS"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    path(edge.x,edge.y,edge.x + (edge.x>590?-45:45),edge.y-35,cls);
-    label(`${name}: box inside / QB`,edge.x,edge.y-55,"read-label");
+    path(edge.x,edge.y,edge.x+dir*18,edge.y-50,cls);
+    label(`${name}: hands / vertical key / edge`,edge.x,edge.y-70,"read-label");
   }
 
-  if(reaction === "containRush"){
+  if(reaction === "jackContainRush"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    path(edge.x,edge.y,edge.x + (edge.x>590?-25:25),edge.y-68,cls);
-    label(`${name}: contain rush`,edge.x,edge.y-86,"read-label");
+    path(edge.x,edge.y,edge.x-dir*28,edge.y-72,cls);
+    label(`${name}: contain rush`,edge.x,edge.y-92,"read-label");
   }
 
-  if(reaction === "coverage"){
+  if(reaction === "jackBoxOff" || reaction === "jackSetEdge"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    path(edge.x,edge.y,edge.x + (edge.x>590?-45:45),edge.y-70,cls);
-    label(`${name}: step to LOS → open/depth`,edge.x,edge.y-90,"read-label");
+    label(`${name}: leverage point / set edge`,edge.x,edge.y-30,"read-label");
   }
-}
 
-function explain(s){
-  return `${s.correct}. This matches the trainer rule: identify the helmet/shoulder block first, then react immediately. Down with puller creates spill/box rules by alignment. Zone and base/out attack the leverage point. High hat sends on-the-line Jack to contain rush and off-ball Sam/Jack into coverage.`;
+  if(reaction === "jackLateContain"){
+    path(start.x,start.y,start.x-dir*24,start.y-34,cls);
+    label(`${name}: hold / late contain`,start.x-dir*38,start.y-55,"read-label");
+  }
+
+  if(reaction === "jackBoxQB"){
+    path(start.x,start.y,edge.x,edge.y,cls);
+    path(edge.x,edge.y,edge.x-dir*45,edge.y-35,cls);
+    label(`${name}: box inside / QB point`,edge.x,edge.y-55,"read-label");
+  }
+
+  if(reaction === "jackCoverage"){
+    path(start.x,start.y,edge.x,edge.y,cls);
+    path(edge.x,edge.y,edge.x-dir*48,edge.y-72,cls);
+    label(`${name}: step LOS → open/depth`,edge.x,edge.y-92,"read-label");
+  }
+
+  if(reaction === "samCutback"){
+    path(start.x,start.y,start.x-dir*50,start.y-10,cls);
+    path(start.x-dir*50,start.y-10,start.x-dir*75,start.y-35,cls);
+    label(`${name}: slow cutback`,start.x-dir*85,start.y-55,"read-label");
+  }
+
+  if(reaction === "samCoverage"){
+    path(start.x,start.y,edge.x,edge.y,cls);
+    path(edge.x,edge.y,edge.x-dir*48,edge.y-72,cls);
+    label(`${name}: step LOS → open/depth`,edge.x,edge.y-92,"read-label");
+  }
+
+  if(reaction === "samBox"){
+    path(start.x,start.y,edge.x,edge.y,cls);
+    label(`${name}: box at leverage point`,edge.x,edge.y-30,"read-label");
+  }
+
+  if(reaction === "samForceBounce"){
+    path(start.x,start.y,edge.x,edge.y,cls);
+    path(edge.x,edge.y,edge.x-dir*50,edge.y+20,cls);
+    label(`${name}: hold bounce → B cutback`,edge.x,edge.y-30,"read-label");
+  }
 }
 
 function updateAccuracy(){
