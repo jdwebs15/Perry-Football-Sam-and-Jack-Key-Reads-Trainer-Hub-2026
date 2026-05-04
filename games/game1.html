@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Game 1 — Key Read Trainer</title>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#0b0f1a;
+  color:white;
+}
+
+.wrap {
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
+}
+
+h1 {
+  text-align:center;
+}
+
+.field {
+  background:#1c2333;
+  border-radius:12px;
+  padding:20px;
+  margin:20px 0;
+  position:relative;
+  height:420px;
+}
+
+.player {
+  position:absolute;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.def { background:#2ecc71; }
+.off { background:#e74c3c; }
+
+.label {
+  position:absolute;
+  font-size:12px;
+  color:#aaa;
+}
+
+.question {
+  text-align:center;
+  margin:20px 0;
+  font-size:20px;
+}
+
+.choices {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+button {
+  padding:15px;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:#34495e;
+  color:white;
+}
+
+button:hover {
+  background:#3d566e;
+}
+
+.hud {
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px;
+}
+
+.feedback {
+  text-align:center;
+  margin-top:15px;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<h1>Sam & Jack Key Read Trainer</h1>
+
+<div class="hud">
+  <div>Question: <span id="qNum">1</span>/10</div>
+  <div>Accuracy: <span id="acc">100</span>%</div>
+</div>
+
+<div class="field" id="field"></div>
+
+<div class="question" id="question">What is your key read?</div>
+
+<div class="choices">
+  <button onclick="answer('down')">DOWN</button>
+  <button onclick="answer('pull')">PULL</button>
+  <button onclick="answer('high')">HIGH HAT</button>
+  <button onclick="answer('out')">OUT / BASE</button>
+</div>
+
+<div class="feedback" id="feedback"></div>
+
+</div>
+
+<script>
+let current = 0;
+let correct = 0;
+
+const scenarios = [
+  {front:"under", key:"down"},
+  {front:"under", key:"pull"},
+  {front:"under", key:"high"},
+  {front:"okie", key:"down"},
+  {front:"okie", key:"pull"},
+  {front:"okie", key:"high"},
+  {front:"under", key:"out"},
+  {front:"okie", key:"out"},
+  {front:"under", key:"down"},
+  {front:"okie", key:"pull"}
+];
+
+function drawFront(type){
+  const field = document.getElementById("field");
+  field.innerHTML = "";
+
+  // Offensive Line
+  for(let i=0;i<5;i++){
+    addPlayer(field, 300 + i*60, 140, "OL", "off");
+  }
+
+  // QB
+  addPlayer(field, 420, 80, "QB", "off");
+
+  if(type==="under"){
+
+    // DEFENSIVE FRONT (UNDER)
+    addPlayer(field, 300, 200, "E", "def");     // Strong End 5
+    addPlayer(field, 360, 200, "N", "def");     // Nose shade
+    addPlayer(field, 420, 200, "T", "def");     // 3-tech
+    addPlayer(field, 480, 200, "J", "def");     // Jack 5-tech (LOS)
+
+    // LBs
+    addPlayer(field, 350, 260, "M", "def");
+    addPlayer(field, 430, 260, "W", "def");
+    addPlayer(field, 260, 260, "S", "def");
+
+  }
+
+  if(type==="okie"){
+
+    // DEFENSIVE FRONT (OKIE)
+    addPlayer(field, 300, 200, "E", "def");     // End
+    addPlayer(field, 360, 200, "N", "def");     // Nose
+    addPlayer(field, 420, 200, "T", "def");     // 4i
+
+    // Sam & Jack OFF BALL
+    addPlayer(field, 250, 260, "S", "def");     // Sam 4x4
+    addPlayer(field, 500, 260, "J", "def");     // Jack 4x4
+
+    // LBs
+    addPlayer(field, 350, 260, "M", "def");
+    addPlayer(field, 430, 260, "W", "def");
+  }
+}
+
+function addPlayer(field, x, y, text, cls){
+  let p = document.createElement("div");
+  p.className = "player " + cls;
+  p.style.left = x + "px";
+  p.style.top = y + "px";
+  p.innerText = text;
+  field.appendChild(p);
+}
+
+function answer(choice){
+  let correctKey = scenarios[current].key;
+
+  if(choice === correctKey){
+    correct++;
+    document.getElementById("feedback").innerText = "Correct";
+    setTimeout(next, 1200);
+  } else {
+    document.getElementById("feedback").innerText = "Incorrect — fix your eyes";
+  }
+
+  document.getElementById("acc").innerText = Math.round((correct/(current+1))*100);
+}
+
+function next(){
+  current++;
+
+  if(current >= scenarios.length){
+    document.getElementById("question").innerText = "Complete";
+    return;
+  }
+
+  document.getElementById("feedback").innerText = "";
+  document.getElementById("qNum").innerText = current+1;
+
+  drawFront(scenarios[current].front);
+}
+
+drawFront(scenarios[current].front);
+</script>
+
+</body>
+</html>
