@@ -3,544 +3,297 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Game 1 — Sam & Jack Key Read Reaction Trainer</title>
+<title>Game 1 — Key Read Reaction Trainer</title>
 
 <style>
-:root{
-  --bg:#07111f;
-  --field:#182337;
-  --text:#f8fafc;
-  --muted:#b8c4d6;
-  --red:#ef4444;
-  --green:#33d17a;
-  --blue:#4da3ff;
-  --yellow:#ffd166;
-  --purple:#c084fc;
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b1220;
+  color:white;
 }
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#07111f;color:var(--text)}
-.wrap{width:min(1180px,calc(100% - 28px));margin:0 auto;padding:22px 0 36px}
-header{text-align:center}
-.kicker{color:var(--yellow);font-weight:900;text-transform:uppercase;letter-spacing:.08em}
-h1{margin:8px 0;font-size:clamp(1.8rem,4vw,3rem)}
-.sub{color:var(--muted);max-width:900px;margin:0 auto;line-height:1.45}
-.hud{display:flex;justify-content:space-between;margin:18px 0 12px;font-weight:900}
-.field{position:relative;height:560px;border-radius:18px;background:var(--field);border:1px solid rgba(255,255,255,.16);overflow:hidden}
-.los{position:absolute;left:70px;right:70px;top:260px;border-top:3px solid rgba(255,255,255,.25)}
-.front-title{position:absolute;left:22px;top:18px;font-weight:900}
-.strength{position:absolute;right:22px;top:18px;font-weight:900;color:var(--yellow)}
-.player{position:absolute;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,.75);z-index:8}
-.off{background:var(--red)}
-.def{background:var(--green);color:#04130a}
-.focus{outline:4px solid var(--yellow);box-shadow:0 0 18px rgba(255,209,102,.8)}
-.tag{position:absolute;transform:translate(-50%,-50%);font-size:.72rem;color:var(--muted);font-weight:900;z-index:9;white-space:nowrap}
-.read-label{position:absolute;padding:6px 9px;border-radius:999px;background:rgba(0,0,0,.52);border:1px solid rgba(255,255,255,.18);font-size:.72rem;font-weight:900;transform:translate(-50%,-50%);z-index:12;white-space:nowrap}
-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
-.off-line{stroke:var(--red);stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowRed)}
-.ball-line{stroke:var(--purple);stroke-width:5;fill:none;stroke-dasharray:8 7;stroke-linecap:round;marker-end:url(#arrowPurple)}
-.def-sam{stroke:var(--yellow);stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowYellow)}
-.def-jack{stroke:var(--blue);stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowBlue)}
-.draw{stroke-dasharray:500;stroke-dashoffset:500;animation:drawLine 1.2s ease forwards}
-@keyframes drawLine{to{stroke-dashoffset:0}}
-.question-card{margin-top:16px;padding:18px;border-radius:18px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.055);text-align:center}
-.scenario-title{color:var(--yellow);font-weight:900;text-transform:uppercase;margin-bottom:8px}
-.question{font-size:1.15rem;font-weight:900;margin-bottom:14px;line-height:1.35}
-.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:980px;margin:0 auto}
-button{min-height:64px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:#34495e;color:white;font-weight:900;cursor:pointer;padding:10px;line-height:1.25}
-button:hover{filter:brightness(1.12)}
-button:disabled{opacity:.55}
-.feedback{min-height:80px;margin-top:14px;font-weight:800;line-height:1.45;color:var(--muted)}
-.correct{color:var(--green)}
-.incorrect{color:#ff8a8a}
-.complete{display:none;margin-top:16px;padding:18px;border-radius:18px;background:rgba(51,209,122,.12);border:1px solid rgba(51,209,122,.35);text-align:center}
-@media(max-width:760px){.field{height:500px}.choices{grid-template-columns:1fr}.player{width:36px;height:36px;font-size:.64rem}}
+
+.wrap{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+
+h1{text-align:center}
+
+.field{
+  position:relative;
+  height:520px;
+  background:#1c2538;
+  border-radius:14px;
+  margin:20px 0;
+}
+
+.player{
+  position:absolute;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:bold;
+  transform:translate(-50%,-50%);
+}
+
+.off{background:#e74c3c;}
+.def{background:#2ecc71;color:#000;}
+
+svg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+
+.line{
+  stroke:#e74c3c;
+  stroke-width:4;
+  fill:none;
+}
+
+.react{
+  stroke:#4da3ff;
+  stroke-width:4;
+  fill:none;
+  stroke-dasharray:400;
+  stroke-dashoffset:400;
+  animation:draw 1s forwards;
+}
+
+.react2{
+  stroke:#ffd166;
+  stroke-width:4;
+  fill:none;
+  stroke-dasharray:400;
+  stroke-dashoffset:400;
+  animation:draw 1s forwards;
+}
+
+@keyframes draw{
+  to{stroke-dashoffset:0}
+}
+
+.label{
+  position:absolute;
+  background:#000a;
+  padding:4px 6px;
+  border-radius:6px;
+  font-size:12px;
+}
+
+.question{
+  text-align:center;
+  font-size:18px;
+  margin:10px 0;
+}
+
+.choices{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+button{
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  background:#34495e;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.feedback{
+  text-align:center;
+  margin-top:10px;
+  font-weight:bold;
+}
+
 </style>
 </head>
 
 <body>
 <div class="wrap">
 
-<header>
-  <div class="kicker">Legend Mastery Series • Sam & Jack Trainer</div>
-  <h1>Game 1 — Key Read Reaction Trainer</h1>
-  <p class="sub">
-    Read the offensive play first. Choose the correct Sam/Jack reaction.
-    After the choice, the game animates both Sam and Jack reactions.
-  </p>
-</header>
+<h1>Sam & Jack Reaction Trainer</h1>
 
-<section class="hud">
-  <div>Question: <span id="qNum">1</span>/<span id="qTotal">8</span></div>
-  <div>Accuracy: <span id="accuracy">100</span>%</div>
-</section>
+<div class="field" id="field"></div>
 
-<section class="field" id="field">
-  <div class="front-title" id="frontTitle"></div>
-  <div class="strength" id="strengthTitle"></div>
-  <div class="los"></div>
+<div class="question" id="question"></div>
 
-  <svg id="movementLayer" viewBox="0 0 1180 560" preserveAspectRatio="none">
-    <defs>
-      <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-        <path d="M0,0 L0,6 L9,3 z" fill="#ef4444"></path>
-      </marker>
-      <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-        <path d="M0,0 L0,6 L9,3 z" fill="#c084fc"></path>
-      </marker>
-      <marker id="arrowYellow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-        <path d="M0,0 L0,6 L9,3 z" fill="#ffd166"></path>
-      </marker>
-      <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-        <path d="M0,0 L0,6 L9,3 z" fill="#4da3ff"></path>
-      </marker>
-    </defs>
-  </svg>
-</section>
+<div class="choices" id="choices"></div>
 
-<section class="question-card">
-  <div class="scenario-title" id="scenarioTitle"></div>
-  <div class="question" id="questionText"></div>
-  <div class="choices" id="choices"></div>
-  <div class="feedback" id="feedback"></div>
-</section>
-
-<section class="complete" id="completeBox">
-  <h2>Game Complete</h2>
-  <p id="finalScore"></p>
-  <button onclick="restartGame()">Restart Game</button>
-</section>
+<div class="feedback" id="feedback"></div>
 
 </div>
 
 <script>
 const field = document.getElementById("field");
-const svg = document.getElementById("movementLayer");
+const feedback = document.getElementById("feedback");
 
 const scenarios = [
-  {
-    front:"UNDER",
-    strength:"RIP — Strength Right",
-    title:"Under Rip — Outside Hat to Jack",
-    focus:"Jack",
-    correct:"jackEdgeSamCutback",
-    question:"Jack is in a weak 5-tech. The weak tackle shows outside hat/base pressure to Jack. What is the correct reaction?",
-    choices:[
-      ["jackEdgeSamCutback","Jack attacks his leverage point and sets a hard edge; Sam takes read steps, confirms ball away, and slow cuts back."],
-      ["jackSpill","Jack wrong-arms a puller and turns vertical in B-gap."],
-      ["jackDrop","Jack opens to #2 and plays coverage."],
-      ["samBlitz","Sam blitzes C-gap immediately."]
-    ],
-    explanation:"Correct. Outside hat/base to Jack is not a spill read. Jack attacks the leverage point, locks out/sets the edge, keeps outside leverage, and forces the ball back inside. Sam is away from the ball, takes read steps, confirms ball away, and works slow cutback.",
-    offense:()=>{
-      path(790,260,850,268,"off-line");
-      path(590,105,810,170,"ball-line");
-      label("Outside hat/base to Jack",840,245);
-    },
-    defense:()=>{
-      path(825,305,875,285,"def-jack draw");
-      path(875,285,895,260,"def-jack draw");
-      label("Jack: leverage point / hard edge",900,245);
+{
+  question:"Jack gets DOWN + PULLER. Sam gets PULL AWAY / GAP-HINGE. What do they do?",
+  correct:"A",
 
-      path(910,370,880,358,"def-sam draw");
-      path(880,358,825,345,"def-sam draw");
-      label("Sam: slow cutback after read",830,420);
-    }
+  choices:{
+    A:"Jack spills + vertical B-gap | Sam slow cutback",
+    B:"Jack boxes | Sam blitzes",
+    C:"Jack chases RB | Sam drops",
+    D:"Both drop"
   },
-  {
-    front:"UNDER",
-    strength:"RIP — Strength Right",
-    title:"Under Rip — Power Weak to Jack",
-    focus:"Jack",
-    correct:"jackSpillSamCutback",
-    question:"Jack gets down block with a pulling guard coming to him. Sam gets pull-away/gap-hinge away from the play. What is the correct full reaction?",
-    choices:[
-      ["jackSpillSamCutback","Jack flattens down the line, wrong-arms/spills, then turns vertical in B-gap; Sam treats pull-away like down/no puller and slow cuts back."],
-      ["jackBoxSamBlitz","Jack boxes the kickout wide; Sam blitzes off the edge."],
-      ["jackCoverage","Both Sam and Jack drop into coverage."],
-      ["jackChase","Jack chases the back across the formation immediately."]
-    ],
-    explanation:"Correct. Jack on the LOS plays this like the End: flat down the line, wrong-arm/spill the puller, close the window, and turn vertical into B-gap. Sam has pull-away/gap-hinge. Because there is a 5-tech End to his side for QB pull, Sam confirms ball away and slow cuts back.",
-    offense:()=>{
-      path(390,260,470,266,"off-line");
-      path(470,260,350,320,"off-line");
-      path(590,105,410,170,"ball-line");
-      label("Down + puller to Jack",405,370);
-      label("Sam side: gap-hinge / pull away",840,245);
-    },
-    defense:()=>{
-      path(355,305,410,306,"def-jack draw");
-      path(410,306,445,268,"def-jack draw");
-      path(445,268,448,220,"def-jack draw");
-      label("Jack: spill flat, vertical B",480,220);
 
-      path(910,370,880,358,"def-sam draw");
-      path(880,358,825,345,"def-sam draw");
-      label("Sam: slow cutback",835,420);
-    }
+  drawBlocks:()=>{
+    line(400,260,450,260);
+    label("Down Block",450,260);
+
+    line(450,260,320,320);
+    label("Puller",320,320);
+
+    line(800,260,840,260);
+    label("Gap-Hinge / Pull Away",860,260);
   },
-  {
-    front:"OKIE",
-    strength:"LIZ — Strength Left",
-    title:"Okie Liz — Power Strong to Sam",
-    focus:"Sam",
-    correct:"samBoxJackLate",
-    question:"Power is coming to Sam off the ball. Jack is away from the play in Okie. What is the correct reaction?",
-    choices:[
-      ["samBoxJackLate","Sam wins to the leverage point and boxes the kickout; Jack holds leverage and plays late pursuit/boot/reverse."],
-      ["samSpillJackSpill","Both Sam and Jack wrong-arm pullers."],
-      ["samDrop","Sam drops to coverage because the guard pulled."],
-      ["jackFastCutback","Jack sprints immediately to backside A-gap."]
-    ],
-    explanation:"Correct. Off-ball Sam races to the leverage point, sets the edge tightly, boxes the kickout, and keeps his outside arm free. Jack is away in Okie with no C-gap player to his side, so he holds leverage and plays late pursuit/contain for boot, reverse, or QB pull.",
-    offense:()=>{
-      path(470,260,390,266,"off-line");
-      path(710,260,280,335,"off-line");
-      path(590,105,340,165,"ball-line");
-      label("Power to Sam",305,300);
-    },
-    defense:()=>{
-      path(270,370,250,325,"def-sam draw");
-      path(250,325,240,285,"def-sam draw");
-      label("Sam: box / set edge",245,270);
 
-      path(910,370,900,340,"def-jack draw");
-      path(900,340,895,305,"def-jack draw");
-      label("Jack: hold leverage / late pursuit",895,290);
-    }
-  },
-  {
-    front:"OKIE",
-    strength:"RIP — Strength Right",
-    title:"Okie Rip — Zone Read at Jack",
-    focus:"Jack",
-    correct:"jackInsideQBSamCutback",
-    question:"Zone Read is at Jack in Okie. Sam is away from the play. What is the correct reaction?",
-    choices:[
-      ["jackInsideQBSamCutback","Jack boxes the ball back inside and plays inside point of QB; Sam confirms ball away and works slow cutback."],
-      ["jackChaseGive","Jack chases the give immediately."],
-      ["samBox","Sam boxes a kickout on the opposite side."],
-      ["bothCoverage","Both players open to coverage."]
-    ],
-    explanation:"Correct. Jack is off the ball in Okie. He boxes the ball back inside and plays the inside point of the QB on pull. Sam confirms ball away and works slow cutback/reverse responsibility.",
-    offense:()=>{
-      path(390,260,330,260,"off-line");
-      path(470,260,420,260,"off-line");
-      path(590,105,505,155,"ball-line");
-      path(590,170,455,210,"ball-line");
-      label("Zone Read at Jack",410,235);
-    },
-    defense:()=>{
-      path(270,370,320,330,"def-jack draw");
-      path(320,330,370,285,"def-jack draw");
-      label("Jack: inside point QB",395,285);
+  drawReaction:()=>{
+    react(350,300,420,300);
+    react(420,300,450,250);
+    label("Jack: Spill → B Gap",460,240);
 
-      path(910,370,880,358,"def-sam draw");
-      path(880,358,825,345,"def-sam draw");
-      label("Sam: slow cutback",835,420);
-    }
-  },
-  {
-    front:"UNDER",
-    strength:"LIZ — Strength Left",
-    title:"Under Liz — Zone Read at Jack",
-    focus:"Jack",
-    correct:"jackOutsideQBSamFit",
-    question:"Zone Read is at Jack on the LOS in Under. What is the correct reaction?",
-    choices:[
-      ["jackOutsideQBSamFit","Jack squeezes, keeps outside leverage on QB, and does not chase the give; Sam fits flow to his side if ball declares."],
-      ["jackChaseGive","Jack chases the give immediately."],
-      ["jackBoxPuller","Jack boxes a puller."],
-      ["samCoverage","Sam opens to coverage immediately."]
-    ],
-    explanation:"Correct. Jack is a weak 5-tech in Under, so he plays like the End. Squeeze, stay square, maintain outside leverage on the QB, and do not be a hero chasing the give. Sam reads flow and fits if the ball declares to him.",
-    offense:()=>{
-      path(790,260,730,262,"off-line");
-      path(710,260,650,262,"off-line");
-      path(590,105,675,155,"ball-line");
-      path(590,170,730,220,"ball-line");
-      label("Zone Read at Jack",750,235);
-    },
-    defense:()=>{
-      path(825,305,780,302,"def-jack draw");
-      path(780,302,750,255,"def-jack draw");
-      label("Jack: outside point QB",750,240);
-
-      path(270,370,315,340,"def-sam draw");
-      label("Sam: flow fit / scrape",330,335);
-    }
-  },
-  {
-    front:"OKIE",
-    strength:"LIZ — Strength Left",
-    title:"Okie Liz — Outside Zone to Sam",
-    focus:"Sam",
-    correct:"samEdgeJackLate",
-    question:"Outside Zone is coming to Sam. Jack is backside in Okie. What is the correct reaction?",
-    choices:[
-      ["samEdgeJackLate","Sam maintains outside leverage, sets a hard edge, and shrinks the vertical seam; Jack holds leverage for boot/reverse/QB pull."],
-      ["samSpill","Sam wrong-arms a puller."],
-      ["jackFastCutback","Jack sprints across to A-gap immediately."],
-      ["samDrop","Sam drops to coverage because the tackle went wide."]
-    ],
-    explanation:"Correct. Outside hat and numbers wide means Sam adjusts course, keeps outside leverage, gets to the LOS or just beyond, and sets a hard edge. Jack does not overrun backside; he holds leverage for boot, reverse, or QB pull.",
-    offense:()=>{
-      path(390,260,330,250,"off-line");
-      path(470,260,410,250,"off-line");
-      path(590,105,335,160,"ball-line");
-      label("Outside Zone to Sam",330,235);
-    },
-    defense:()=>{
-      path(270,370,245,325,"def-sam draw");
-      path(245,325,235,280,"def-sam draw");
-      label("Sam: hard edge",235,265);
-
-      path(910,370,900,340,"def-jack draw");
-      path(900,340,895,305,"def-jack draw");
-      label("Jack: hold / late pursuit",895,290);
-    }
-  },
-  {
-    front:"UNDER",
-    strength:"RIP — Strength Right",
-    title:"Under Rip — High Hat at Jack",
-    focus:"Jack",
-    correct:"jackRushSamCoverage",
-    question:"Jack is on the LOS in Under and gets high hat/pass set. Sam also gets pass read. What is the correct reaction?",
-    choices:[
-      ["jackRushSamCoverage","Jack converts to contain rush; Sam enters coverage rules, opening to #2."],
-      ["jackCoverage","Jack opens to #2 because high hat always means coverage."],
-      ["samSpill","Sam wrong-arms the tackle."],
-      ["bothCutback","Both players slow cutback."]
-    ],
-    explanation:"Correct. Under Jack on the LOS is a contain rusher on high hat. He rushes through his gap, keeps outside shoulder/contain, and never runs past QB depth. Off-ball Sam enters coverage rules.",
-    offense:()=>{
-      path(390,260,390,205,"off-line");
-      path(790,260,790,205,"off-line");
-      label("High Hat / Pass",590,190);
-    },
-    defense:()=>{
-      path(355,305,350,245,"def-jack draw");
-      path(350,245,370,185,"def-jack draw");
-      label("Jack: contain rush",370,170);
-
-      path(910,370,890,330,"def-sam draw");
-      path(890,330,865,285,"def-sam draw");
-      label("Sam: open to #2",865,270);
-    }
-  },
-  {
-    front:"OKIE",
-    strength:"RIP — Strength Right",
-    title:"Okie Rip — High Hat at Sam and Jack",
-    focus:"Sam",
-    correct:"bothCoverage",
-    question:"Sam and Jack are both off the ball in Okie and get high hat/pass. What is the correct reaction?",
-    choices:[
-      ["bothCoverage","Both enter coverage rules: open, feel route threats, wall/carry, then look for work."],
-      ["jackRush","Jack rushes because he is always a rush player."],
-      ["samBox","Sam boxes a kickout."],
-      ["bothSpill","Both wrong-arm pullers."]
-    ],
-    explanation:"Correct. In Okie, Sam and Jack are off the ball. High hat sends them into coverage rules: open to the threat, feel #2, see #1, wall/carry, square, and look for work.",
-    offense:()=>{
-      path(390,260,390,205,"off-line");
-      path(790,260,790,205,"off-line");
-      label("High Hat / Pass",590,190);
-    },
-    defense:()=>{
-      path(910,370,890,330,"def-sam draw");
-      path(890,330,865,285,"def-sam draw");
-      label("Sam: coverage",865,270);
-
-      path(270,370,290,330,"def-jack draw");
-      path(290,330,315,285,"def-jack draw");
-      label("Jack: coverage",315,270);
-    }
+    react2(850,340,800,330);
+    label("Sam: Slow Cutback",790,330);
   }
+},
+
+{
+  question:"Jack gets OUTSIDE HAT. Sam gets BALL AWAY. What do they do?",
+  correct:"A",
+
+  choices:{
+    A:"Jack sets edge | Sam slow cutback",
+    B:"Jack spills | Sam blitzes",
+    C:"Jack drops | Sam drops",
+    D:"Jack chases RB"
+  },
+
+  drawBlocks:()=>{
+    line(800,260,860,260);
+    label("Outside Hat / Base",880,260);
+
+    label("Ball Away",300,260);
+  },
+
+  drawReaction:()=>{
+    react(850,300,900,280);
+    label("Jack: Set Edge",910,280);
+
+    react2(300,330,350,320);
+    label("Sam: Slow Cutback",360,320);
+  }
+}
 ];
 
-let order=[];
-let current=0;
-let correct=0;
-let attempts=0;
-let locked=false;
+let current = 0;
 
-function shuffle(arr){
-  const a=[...arr];
-  for(let i=a.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
+function drawScenario(){
+  field.innerHTML = "";
+  feedback.innerText = "";
+
+  // OL
+  for(let i=0;i<5;i++){
+    add("OL",350+i*80,260,"off");
   }
-  return a;
+
+  // DEF
+  add("J",850,300,"def");
+  add("S",300,340,"def");
+
+  scenarios[current].drawBlocks();
+
+  document.getElementById("question").innerText = scenarios[current].question;
+
+  let cHTML="";
+  for(let key in scenarios[current].choices){
+    cHTML+=`<button onclick="answer('${key}')">${scenarios[current].choices[key]}</button>`;
+  }
+  document.getElementById("choices").innerHTML = cHTML;
 }
 
-function startGame(){
-  order=shuffle(scenarios);
-  current=0;
-  correct=0;
-  attempts=0;
-  document.getElementById("qTotal").textContent=order.length;
-  document.getElementById("completeBox").style.display="none";
-  loadScenario();
-}
+function answer(choice){
+  if(choice===scenarios[current].correct){
+    feedback.innerText="Correct";
+    scenarios[current].drawReaction();
 
-function restartGame(){startGame();window.scrollTo({top:0,behavior:"smooth"})}
-
-function loadScenario(){
-  locked=false;
-  const s=order[current];
-  clearField();
-  document.getElementById("qNum").textContent=current+1;
-  updateAccuracy();
-  document.getElementById("scenarioTitle").textContent=s.title;
-  document.getElementById("questionText").textContent=s.question;
-  document.getElementById("feedback").textContent="";
-  document.getElementById("feedback").className="feedback";
-  document.getElementById("frontTitle").textContent=s.front;
-  document.getElementById("strengthTitle").textContent=s.strength;
-
-  drawOffense();
-  if(s.front==="UNDER") drawUnder(s.strength.startsWith("RIP"),s.focus);
-  else drawOkie(s.strength.startsWith("RIP"),s.focus);
-
-  s.offense();
-  renderChoices(s);
-}
-
-function clearField(){
-  [...field.querySelectorAll(".player,.tag,.read-label")].forEach(e=>e.remove());
-  [...svg.querySelectorAll("path")].forEach(e=>e.remove());
-}
-
-function drawOffense(){
-  addPlayer("X",205,215,"off");
-  addPlayer("LT",390,260,"off");
-  addPlayer("LG",470,260,"off");
-  addPlayer("C",590,260,"off");
-  addPlayer("RG",710,260,"off");
-  addPlayer("RT",790,260,"off");
-  addPlayer("Y",900,215,"off");
-  addPlayer("QB",590,170,"off");
-  addPlayer("RB",590,105,"off");
-}
-
-function drawUnder(rip,focus){
-  if(rip){
-    addPlayer("E",825,305,"def",focus==="End"); label("5 strong",825,340);
-    addPlayer("N",625,305,"def"); label("shade strong",625,340);
-    addPlayer("T",430,305,"def"); label("3 weak",430,340);
-    addPlayer("J",355,305,"def",focus==="Jack"); label("5 weak",355,340);
-    addPlayer("S",910,370,"def",focus==="Sam"); label("off ball",910,407);
+    setTimeout(()=>{
+      current++;
+      if(current>=scenarios.length){
+        document.getElementById("question").innerText="Complete";
+        document.getElementById("choices").innerHTML="";
+      } else {
+        drawScenario();
+      }
+    },2000);
   } else {
-    addPlayer("E",355,305,"def",focus==="End"); label("5 strong",355,340);
-    addPlayer("N",555,305,"def"); label("shade strong",555,340);
-    addPlayer("T",750,305,"def"); label("3 weak",750,340);
-    addPlayer("J",825,305,"def",focus==="Jack"); label("5 weak",825,340);
-    addPlayer("S",270,370,"def",focus==="Sam"); label("off ball",270,407);
+    feedback.innerText="Read the block again";
   }
-  addPlayer("M",535,385,"def");
-  addPlayer("W",645,385,"def");
-  addPlayer("SS",360,485,"def");
-  addPlayer("FS",820,485,"def");
 }
 
-function drawOkie(rip,focus){
-  if(rip){
-    addPlayer("E",825,305,"def"); label("5 strong",825,340);
-    addPlayer("N",625,305,"def"); label("shade strong",625,340);
-    addPlayer("T",430,305,"def"); label("4i weak",430,340);
-    addPlayer("S",910,370,"def",focus==="Sam"); label("4 x 4",910,407);
-    addPlayer("J",270,370,"def",focus==="Jack"); label("4 x 4",270,407);
-  } else {
-    addPlayer("E",355,305,"def"); label("5 strong",355,340);
-    addPlayer("N",555,305,"def"); label("shade strong",555,340);
-    addPlayer("T",750,305,"def"); label("4i weak",750,340);
-    addPlayer("S",270,370,"def",focus==="Sam"); label("4 x 4",270,407);
-    addPlayer("J",910,370,"def",focus==="Jack"); label("4 x 4",910,407);
-  }
-  addPlayer("M",535,385,"def");
-  addPlayer("W",645,385,"def");
-  addPlayer("SS",360,485,"def");
-  addPlayer("FS",820,485,"def");
+function add(text,x,y,type){
+  let d=document.createElement("div");
+  d.className="player "+type;
+  d.style.left=x+"px";
+  d.style.top=y+"px";
+  d.innerText=text;
+  field.appendChild(d);
 }
 
-function renderChoices(s){
-  const box=document.getElementById("choices");
-  box.innerHTML="";
-  shuffle(s.choices).forEach(c=>{
-    const btn=document.createElement("button");
-    btn.textContent=c[1];
-    btn.onclick=()=>submitAnswer(c[0]);
-    box.appendChild(btn);
-  });
+function line(x1,y1,x2,y2){
+  let l=document.createElementNS("http://www.w3.org/2000/svg","line");
+  l.setAttribute("x1",x1);
+  l.setAttribute("y1",y1);
+  l.setAttribute("x2",x2);
+  l.setAttribute("y2",y2);
+  l.setAttribute("class","line");
+  field.appendChild(l);
 }
 
-function submitAnswer(id){
-  if(locked)return;
-  const s=order[current];
-  attempts++;
-
-  if(id!==s.correct){
-    document.getElementById("feedback").className="feedback incorrect";
-    document.getElementById("feedback").textContent="Not yet. Read the offensive key first, then match the Sam and Jack reaction to play-side/backside responsibility.";
-    updateAccuracy();
-    return;
-  }
-
-  locked=true;
-  correct++;
-  [...document.querySelectorAll("#choices button")].forEach(b=>b.disabled=true);
-
-  s.defense();
-
-  const fb=document.getElementById("feedback");
-  fb.className="feedback correct";
-  fb.textContent=s.explanation;
-
-  updateAccuracy();
-
-  setTimeout(()=>{
-    current++;
-    if(current>=order.length) endGame();
-    else loadScenario();
-  },6000);
+function react(x1,y1,x2,y2){
+  let l=document.createElementNS("http://www.w3.org/2000/svg","line");
+  l.setAttribute("x1",x1);
+  l.setAttribute("y1",y1);
+  l.setAttribute("x2",x2);
+  l.setAttribute("y2",y2);
+  l.setAttribute("class","react");
+  field.appendChild(l);
 }
 
-function updateAccuracy(){
-  document.getElementById("accuracy").textContent=attempts===0?100:Math.round((correct/attempts)*100);
+function react2(x1,y1,x2,y2){
+  let l=document.createElementNS("http://www.w3.org/2000/svg","line");
+  l.setAttribute("x1",x1);
+  l.setAttribute("y1",y1);
+  l.setAttribute("x2",x2);
+  l.setAttribute("y2",y2);
+  l.setAttribute("class","react2");
+  field.appendChild(l);
 }
 
-function endGame(){
-  document.getElementById("completeBox").style.display="block";
-  document.getElementById("finalScore").textContent=`Final Accuracy: ${Math.round((correct/attempts)*100)}%`;
+function label(text,x,y){
+  let d=document.createElement("div");
+  d.className="label";
+  d.style.left=x+"px";
+  d.style.top=y+"px";
+  d.innerText=text;
+  field.appendChild(d);
 }
 
-function addPlayer(txt,x,y,type,focus=false){
-  const el=document.createElement("div");
-  el.className=`player ${type}${focus?" focus":""}`;
-  el.style.left=x+"px";
-  el.style.top=y+"px";
-  el.textContent=txt;
-  field.appendChild(el);
-}
-
-function label(txt,x,y){
-  const el=document.createElement("div");
-  el.className=txt.includes(":")||txt.includes("/")||txt.includes("High")||txt.includes("Outside")||txt.includes("Power")||txt.includes("Zone")?"read-label":"tag";
-  el.style.left=x+"px";
-  el.style.top=y+"px";
-  el.textContent=txt;
-  field.appendChild(el);
-}
-
-function path(x1,y1,x2,y2,cls){
-  const p=document.createElementNS("http://www.w3.org/2000/svg","path");
-  p.setAttribute("d",`M ${x1} ${y1} L ${x2} ${y2}`);
-  p.setAttribute("class",cls);
-  svg.appendChild(p);
-}
-
-startGame();
+drawScenario();
 </script>
+
 </body>
 </html>
