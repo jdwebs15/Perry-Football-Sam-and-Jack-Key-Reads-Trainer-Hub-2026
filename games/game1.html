@@ -168,7 +168,7 @@ function shortLabel(r){
     jackBoxQB:"box ball inside, QB point",
     jackSetEdge:"set edge at leverage point",
     jackCoverage:"step LOS, open to coverage",
-    samCutback:"read, confirm away, slow cutback",
+    samCutback:"inside slow cutback to open gap",
     samCoverage:"step LOS, open to coverage",
     samBox:"box kickout at leverage point",
     samForceBounce:"hold bounce, then B cutback"
@@ -187,9 +187,9 @@ function longExplain(r, who){
     jackLateContain:`${who}: no C-gap player to your side means do not cut back. Hold leverage for reverse, boot, broken play, or QB pull.`,
     jackBoxQB:`${who}: off-ball zone/read side means box the ball back inside and play the inside point of the QB.`,
     jackSetEdge:`${who}: base/out off the ball means attack the leverage point just outside the OT, set a hard edge, and keep outside arm free.`,
-    jackCoverage:`${who}: high hat off the ball means short step to the LOS, open, then gain depth into coverage.`,
-    samCutback:`${who}: with a 5-tech to your side, read your key, confirm ball away, stay square, and slow cutback into B-gap.`,
-    samCoverage:`${who}: high hat off the ball means short step toward the LOS, open, then gain depth into coverage.`,
+    jackCoverage:`${who}: high hat off the ball means short step toward the LOS, open, then gain depth away from the LOS into coverage.`,
+    samCutback:`${who}: with a 5-tech to your side, read your key, confirm ball away, stay square, and slow cutback inside to the open gap.`,
+    samCoverage:`${who}: high hat off the ball means short step toward the LOS, open, then gain depth away from the LOS into coverage.`,
     samBox:`${who}: down/puller to you off the ball means win to the leverage point just outside the OT, box the kickout, and force the ball back inside.`,
     samForceBounce:`${who}: zone/base flow to you means hold for bounce, then work square into B-gap cutback as the ball declares.`
   };
@@ -309,7 +309,9 @@ function P(s){
       jack:{x:s.front==="UNDER"?355:270,y:s.front==="UNDER"?305:370},
       sam:{x:910,y:370},
       jackEdge:{x:350,y:255},
-      samEdge:{x:875,y:255}
+      samEdge:{x:875,y:255},
+      jackInside:{x:455,y:330},
+      samInside:{x:785,y:330}
     };
   }
   return {
@@ -318,7 +320,9 @@ function P(s){
     jack:{x:s.front==="UNDER"?825:910,y:s.front==="UNDER"?305:370},
     sam:{x:270,y:370},
     jackEdge:{x:830,y:255},
-    samEdge:{x:305,y:255}
+    samEdge:{x:305,y:255},
+    jackInside:{x:725,y:330},
+    samInside:{x:395,y:330}
   };
 }
 
@@ -334,18 +338,7 @@ function drawBlockAt(key, block, text){
 
   if(block === "Down + Puller"){
     path(key.x,key.y,key.x-d*72,key.y+10,"block-line");
-
-    if(key.side === "left"){
-      path(710,260,650,286,"block-line");
-      path(650,286,515,286,"block-line");
-      path(515,286,330,286,"block-line");
-      label("Backside Guard Pulls Flat",520,306,"read-label");
-    } else {
-      path(470,260,530,286,"block-line");
-      path(530,286,665,286,"block-line");
-      path(665,286,850,286,"block-line");
-      label("Backside Guard Pulls Flat",665,306,"read-label");
-    }
+    drawFlatBacksideGuardPull(key.side);
   }
 
   if(block === "Down — No Puller"){
@@ -378,6 +371,21 @@ function drawBlockAt(key, block, text){
   }
 
   label(text, key.x + d*88, key.y-34, "read-label");
+}
+
+function drawFlatBacksideGuardPull(targetSide){
+  const pullY = 285;
+  if(targetSide === "left"){
+    path(710,260,710,pullY,"block-line");
+    path(710,pullY,520,pullY,"block-line");
+    path(520,pullY,330,pullY,"block-line");
+    label("Backside guard pulls flat behind LOS",525,306,"read-label");
+  } else {
+    path(470,260,470,pullY,"block-line");
+    path(470,pullY,660,pullY,"block-line");
+    path(660,pullY,850,pullY,"block-line");
+    label("Backside guard pulls flat behind LOS",660,306,"read-label");
+  }
 }
 
 function renderChoices(s){
@@ -431,18 +439,23 @@ function submitAnswer(choice, s){
 
 function drawReactions(s){
   const p = P(s);
-  drawReaction("jack", p.jack, p.jackEdge, s.jackReaction);
-  drawReaction("sam", p.sam, p.samEdge, s.samReaction);
+  drawReaction("jack", p, s.jackReaction);
+  drawReaction("sam", p, s.samReaction);
 }
 
-function drawReaction(who, start, edge, reaction){
-  const cls = who === "jack" ? "jack-line draw" : "sam-line draw";
-  const name = who === "jack" ? "Jack" : "Sam";
-  const dir = edge.x > start.x ? 1 : -1;
+function drawReaction(who, p, reaction){
+  const isJack = who === "jack";
+  const cls = isJack ? "jack-line draw" : "sam-line draw";
+  const name = isJack ? "Jack" : "Sam";
+  const start = isJack ? p.jack : p.sam;
+  const edge = isJack ? p.jackEdge : p.samEdge;
+  const inside = isJack ? p.jackInside : p.samInside;
+  const toCenter = start.x > 590 ? -1 : 1;
+  const awayFromLOS = start.y > 300 ? 1 : -1;
 
   if(reaction === "jackSpillB"){
     const flatY = 315;
-    const crossX = edge.x + (dir * 42);
+    const crossX = edge.x + (edge.x < 590 ? 75 : -75);
     path(start.x,start.y,crossX,flatY,cls);
     path(crossX,flatY,crossX,232,cls);
     label(`${name}: flat under puller → vertical B`,crossX,216,"read-label");
@@ -450,7 +463,7 @@ function drawReaction(who, start, edge, reaction){
 
   if(reaction === "jackQB"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    path(edge.x,edge.y,edge.x-dir*36,edge.y-42,cls);
+    path(edge.x,edge.y,edge.x + toCenter*36,edge.y-42,cls);
     label(`${name}: squeeze / QB leverage`,edge.x,edge.y-60,"read-label");
   }
 
@@ -461,13 +474,13 @@ function drawReaction(who, start, edge, reaction){
 
   if(reaction === "jackZoneLOS"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    path(edge.x,edge.y,edge.x+dir*18,edge.y-50,cls);
+    path(edge.x,edge.y,edge.x-toCenter*18,edge.y-50,cls);
     label(`${name}: hands / vertical key / edge`,edge.x,edge.y-70,"read-label");
   }
 
   if(reaction === "jackContainRush"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    path(edge.x,edge.y,edge.x-dir*28,edge.y-72,cls);
+    path(edge.x,edge.y,edge.x + toCenter*28,edge.y-72,cls);
     label(`${name}: contain rush`,edge.x,edge.y-92,"read-label");
   }
 
@@ -477,32 +490,32 @@ function drawReaction(who, start, edge, reaction){
   }
 
   if(reaction === "jackLateContain"){
-    path(start.x,start.y,start.x-dir*24,start.y-34,cls);
-    label(`${name}: hold / late contain`,start.x-dir*38,start.y-55,"read-label");
+    path(start.x,start.y,start.x + toCenter*20,start.y-30,cls);
+    label(`${name}: hold / late contain`,start.x + toCenter*38,start.y-55,"read-label");
   }
 
   if(reaction === "jackBoxQB"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    path(edge.x,edge.y,edge.x-dir*45,edge.y-35,cls);
+    path(edge.x,edge.y,edge.x + toCenter*45,edge.y-35,cls);
     label(`${name}: box inside / QB point`,edge.x,edge.y-55,"read-label");
   }
 
   if(reaction === "jackCoverage"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    path(edge.x,edge.y,edge.x-dir*48,edge.y-72,cls);
-    label(`${name}: step LOS → open/depth`,edge.x,edge.y-92,"read-label");
+    path(edge.x,edge.y,edge.x - toCenter*48,edge.y + 72,cls);
+    label(`${name}: step LOS → open/depth`,edge.x,edge.y+92,"read-label");
   }
 
   if(reaction === "samCutback"){
-    path(start.x,start.y,start.x-dir*50,start.y-10,cls);
-    path(start.x-dir*50,start.y-10,start.x-dir*75,start.y-35,cls);
-    label(`${name}: slow cutback`,start.x-dir*85,start.y-55,"read-label");
+    path(start.x,start.y,start.x + toCenter*52,start.y-10,cls);
+    path(start.x + toCenter*52,start.y-10,inside.x,inside.y,cls);
+    label(`${name}: inside slow cutback`,inside.x,inside.y-28,"read-label");
   }
 
   if(reaction === "samCoverage"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    path(edge.x,edge.y,edge.x-dir*48,edge.y-72,cls);
-    label(`${name}: step LOS → open/depth`,edge.x,edge.y-92,"read-label");
+    path(edge.x,edge.y,edge.x - toCenter*48,edge.y + 72,cls);
+    label(`${name}: step LOS → open/depth`,edge.x,edge.y+92,"read-label");
   }
 
   if(reaction === "samBox"){
@@ -512,8 +525,8 @@ function drawReaction(who, start, edge, reaction){
 
   if(reaction === "samForceBounce"){
     path(start.x,start.y,edge.x,edge.y,cls);
-    path(edge.x,edge.y,edge.x-dir*50,edge.y+20,cls);
-    label(`${name}: hold bounce → B cutback`,edge.x,edge.y-30,"read-label");
+    path(edge.x,edge.y,inside.x,inside.y,cls);
+    label(`${name}: hold bounce → B cutback`,inside.x,inside.y-28,"read-label");
   }
 }
 
