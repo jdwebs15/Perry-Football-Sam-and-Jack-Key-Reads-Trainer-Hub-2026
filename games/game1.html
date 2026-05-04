@@ -374,17 +374,23 @@ function drawBlockAt(key, block, text){
 }
 
 function drawFlatBacksideGuardPull(targetSide){
-  const pullY = 285;
+  /*
+    Puller stays on QB/RB side of the LOS.
+    LOS is y=260.
+    Pull path is behind LOS at y=238.
+  */
+  const pullY = 238;
+
   if(targetSide === "left"){
     path(710,260,710,pullY,"block-line");
-    path(710,pullY,520,pullY,"block-line");
-    path(520,pullY,330,pullY,"block-line");
-    label("Backside guard pulls flat behind LOS",525,306,"read-label");
+    path(710,pullY,525,pullY,"block-line");
+    path(525,pullY,330,pullY,"block-line");
+    label("Backside guard pulls flat behind LOS",525,pullY-18,"read-label");
   } else {
     path(470,260,470,pullY,"block-line");
-    path(470,pullY,660,pullY,"block-line");
-    path(660,pullY,850,pullY,"block-line");
-    label("Backside guard pulls flat behind LOS",660,306,"read-label");
+    path(470,pullY,655,pullY,"block-line");
+    path(655,pullY,850,pullY,"block-line");
+    label("Backside guard pulls flat behind LOS",655,pullY-18,"read-label");
   }
 }
 
@@ -451,14 +457,20 @@ function drawReaction(who, p, reaction){
   const edge = isJack ? p.jackEdge : p.samEdge;
   const inside = isJack ? p.jackInside : p.samInside;
   const toCenter = start.x > 590 ? -1 : 1;
-  const awayFromLOS = start.y > 300 ? 1 : -1;
 
   if(reaction === "jackSpillB"){
-    const flatY = 315;
-    const crossX = edge.x + (edge.x < 590 ? 75 : -75);
-    path(start.x,start.y,crossX,flatY,cls);
-    path(crossX,flatY,crossX,232,cls);
-    label(`${name}: flat under puller → vertical B`,crossX,216,"read-label");
+    /*
+      Spill path:
+      - works between pull course and backside of OL
+      - runs flat under puller
+      - turns vertical toward QB/RB into B-gap
+    */
+    const spillY = 282;
+    const turnX = edge.x < 590 ? 430 : 750;
+
+    path(start.x,start.y,turnX,spillY,cls);
+    path(turnX,spillY,turnX,220,cls);
+    label(`${name}: spill under puller → vertical B`,turnX,204,"read-label");
   }
 
   if(reaction === "jackQB"){
