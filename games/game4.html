@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Game 4 — QB Read & Option Fits</title>
+<style>
+:root{--bg:#07111f;--field:#182337;--text:#f8fafc;--muted:#b8c4d6;--red:#ef4444;--green:#33d17a;--blue:#4da3ff;--yellow:#ffd166;--purple:#c084fc}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{width:min(1180px,calc(100% - 28px));margin:0 auto;padding:22px 0 36px}
+header{text-align:center}.kicker{color:var(--yellow);font-weight:900;text-transform:uppercase;letter-spacing:.08em;font-size:.82rem}
+h1{margin:8px 0;font-size:clamp(1.8rem,4vw,3rem)}.sub{color:var(--muted);max-width:930px;margin:0 auto;line-height:1.45}
+.hud{display:flex;justify-content:space-between;margin:18px 0 12px;font-weight:900}
+.field{position:relative;height:560px;border-radius:18px;background:var(--field);border:1px solid rgba(255,255,255,.16);overflow:hidden}
+.los{position:absolute;left:70px;right:70px;top:260px;border-top:3px solid rgba(255,255,255,.25)}
+.front-title{position:absolute;left:22px;top:18px;font-weight:900}.strength{position:absolute;right:22px;top:18px;font-weight:900;color:var(--yellow)}
+.player{position:absolute;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:900;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,.75);z-index:8}
+.off{background:var(--red)}.def{background:var(--green);color:#04130a}.focus{outline:4px solid var(--yellow);box-shadow:0 0 18px rgba(255,209,102,.8)}
+.tag,.read-label{position:absolute;transform:translate(-50%,-50%);font-size:.72rem;font-weight:900;z-index:12;white-space:nowrap}.tag{color:var(--muted)}
+.read-label{background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.18);padding:6px 9px;border-radius:999px;color:white}
+svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+.block-line{stroke:var(--red);stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowRed)}
+.ball-line{stroke:var(--purple);stroke-width:5;fill:none;stroke-dasharray:8 7;stroke-linecap:round;marker-end:url(#arrowPurple)}
+.mesh-line{stroke:#fff;stroke-width:4;fill:none;stroke-dasharray:6 7;stroke-linecap:round;marker-end:url(#arrowWhite)}
+.sam-line{stroke:var(--yellow);stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowYellow)}
+.jack-line{stroke:var(--blue);stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowBlue)}
+.draw{stroke-dasharray:900;stroke-dashoffset:900;animation:drawLine 1.25s ease forwards}@keyframes drawLine{to{stroke-dashoffset:0}}
+.question-card{margin-top:16px;padding:18px;border-radius:18px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.055);text-align:center}
+.scenario-title{color:var(--yellow);font-weight:900;text-transform:uppercase;margin-bottom:8px}.question{font-size:1.15rem;font-weight:900;margin-bottom:14px;line-height:1.35}
+.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:1000px;margin:0 auto}
+button{min-height:72px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:#34495e;color:white;font-weight:900;cursor:pointer;padding:10px;line-height:1.25}
+button:hover{filter:brightness(1.12)}button:disabled{opacity:.55;cursor:not-allowed}
+.feedback{min-height:90px;margin-top:14px;font-weight:800;line-height:1.45;color:var(--muted)}.correct{color:var(--green)}.incorrect{color:#ff8a8a}
+.complete{display:none;margin-top:16px;padding:18px;border-radius:18px;background:rgba(51,209,122,.12);border:1px solid rgba(51,209,122,.35);text-align:center}
+@media(max-width:760px){.field{height:500px}.choices{grid-template-columns:1fr}.player{width:36px;height:36px;font-size:.64rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="kicker">Legend Mastery Series • Sam & Jack Trainer</div>
+  <h1>Game 4 — QB Read & Option Fits</h1>
+  <p class="sub">Option football forces discipline. Read the block, mesh, and responsibility. Do not chase the give when you are responsible for the QB.</p>
+</header>
+
+<section class="hud">
+  <div>Question: <span id="qNum">1</span>/<span id="qTotal">12</span></div>
+  <div>Accuracy: <span id="accuracy">100</span>%</div>
+</section>
+
+<section class="field" id="field">
+  <div class="front-title" id="frontTitle"></div>
+  <div class="strength" id="strengthTitle"></div>
+  <div class="los"></div>
+  <svg id="svg" viewBox="0 0 1180 560" preserveAspectRatio="none">
+    <defs>
+      <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#ef4444"></path></marker>
+      <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#c084fc"></path></marker>
+      <marker id="arrowWhite" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#fff"></path></marker>
+      <marker id="arrowYellow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#ffd166"></path></marker>
+      <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#4da3ff"></path></marker>
+    </defs>
+  </svg>
+</section>
+
+<section class="question-card">
+  <div class="scenario-title" id="scenarioTitle"></div>
+  <div class="question" id="questionText"></div>
+  <div class="choices" id="choices"></div>
+  <div class="feedback" id="feedback"></div>
+</section>
+
+<section class="complete" id="completeBox">
+  <h2>Game Complete</h2>
+  <p id="finalScore"></p>
+  <button onclick="restartGame()">Restart Game</button>
+</section>
+</div>
+
+<script>
+const field=document.getElementById("field");
+const svg=document.getElementById("svg");
+
+const scenarios=[
+  S("UNDER","RIP","Under Rip — Zone Read Weak / QB Pull","weak","pull","Zone","Pull Away","jackQB","samCutback","Jack must own QB leverage; Sam slow cutback inside."),
+  S("UNDER","RIP","Under Rip — Zone Read Weak / Give","weak","give","Zone","Pull Away","jackQB","samCutback","Jack still cannot chase the give; his rule is QB leverage."),
+  S("UNDER","LIZ","Under Liz — Power Read / QB Keep","strong","keep","Down — No Puller","Base / Out","jackQB","samBounce","Jack plays QB leverage; Sam holds bounce then works B-gap."),
+  S("UNDER","LIZ","Under Liz — Smack Read / QB Threat","weak","pull","Down — No Puller","Zone Away","jackQB","samCutback","Jack squeezes and owns QB; Sam confirms away and cuts back inside."),
+  S("UNDER","RIP","Under Rip — High Hat RPO Look","pass","pass","High Hat","High Hat","jackRush","samCoverage","Jack on LOS converts to contain rush; Sam goes coverage."),
+  S("UNDER","RIP","Under Rip — Counter Read Weak","weak","give","Down + Puller","Base / Gap-Hinge","jackSpill","samCutback","Jack spills the puller; Sam works inside cutback."),
+
+  S("OKIE","RIP","Okie Rip — Zone Read Weak / QB Pull","weak","pull","Zone","Pull Away","jackBoxQB","samCutback","Jack off ball boxes inside and plays QB point."),
+  S("OKIE","RIP","Okie Rip — Zone Read Weak / Give","weak","give","Zone","Pull Away","jackBoxQB","samCutback","Jack cannot chase the give; he boxes and plays QB point."),
+  S("OKIE","LIZ","Okie Liz — Boot Away From Jack","strong","boot","Zone Away","Base / Out","jackLate","samSetEdge","Jack has no C-gap player, so he holds leverage for boot/reverse."),
+  S("OKIE","LIZ","Okie Liz — Power Read Strong to Sam","strong","keep","Zone Away","Down + Puller","jackLate","samBox","Sam boxes kickout; Jack holds late contain."),
+  S("OKIE","RIP","Okie Rip — High Hat Both Sides","pass","pass","High Hat","High Hat","jackCoverage","samCoverage","Both off-ball players step LOS, open, and gain coverage depth."),
+  S("OKIE","LIZ","Okie Liz — Outside Zone Strong / Bounce","strong","give","Base / Out","Zone","jackSetEdge","samBounce","Sam holds bounce and B cutback; Jack sets edge if ball returns.")
+];
+
+let order=[],current=0,correct=0,attempts=0,locked=false;
+
+function S(front,strength,title,flow,mesh,jackBlock,samBlock,jackReaction,samReaction,why){
+  return{front,strength,title,flow,mesh,jackBlock,samBlock,jackReaction,samReaction,why,
+    correct:`Jack: ${short(jackReaction)} | Sam: ${short(samReaction)}`,
+    question:`Flow: ${flowText(flow)}. Mesh: ${meshText(mesh)}. Jack key: ${jackBlock}. Sam key: ${samBlock}. What is the option fit?`
+  };
+}
+function short(r){
+  return{
+    jackQB:"squeeze, QB leverage",
+    jackRush:"contain rush, QB depth",
+    jackSpill:"spill puller, vertical B-gap",
+    jackBoxQB:"box inside, QB point",
+    jackLate:"hold leverage, late contain",
+    jackSetEdge:"set edge, force inside",
+    jackCoverage:"step LOS, open/depth",
+    samCutback:"inside cutback to open gap",
+    samBounce:"hold bounce, B cutback",
+    samBox:"box kickout, force inside",
+    samSetEdge:"set edge, force inside",
+    samCoverage:"step LOS, open/depth"
+  }[r];
+}
+function flowText(f){return f==="weak"?"weak / toward Jack":f==="strong"?"strong / toward Sam":"pass / high hat";}
+function meshText(m){return{pull:"QB pull threat",give:"RB give declared",keep:"QB keep/read phase",boot:"boot/reverse alert",pass:"pass set"}[m];}
+function explain(r,who){
+  return{
+    jackQB:`${who}: squeeze, stay square, keep leverage on the QB, and do not chase the give.`,
+    jackRush:`${who}: high hat on the LOS means contain rush. Keep outside shoulder and never run past QB depth.`,
+    jackSpill:`${who}: down/puller to you. Spill under the flat puller path and turn vertical into B-gap.`,
+    jackBoxQB:`${who}: off-ball read side. Box the ball back inside and play the inside point of the QB.`,
+    jackLate:`${who}: no C-gap player to your side. Hold leverage for boot, reverse, broken play, or QB pull.`,
+    jackSetEdge:`${who}: set the edge at the leverage point just outside the OT and force the ball inside.`,
+    jackCoverage:`${who}: high hat off the ball. Step toward LOS, open, then gain depth away from LOS.`,
+    samCutback:`${who}: confirm ball away, stay square, and cut back inside to the open gap.`,
+    samBounce:`${who}: hold for bounce first, then work square into B-gap cutback as the ball declares.`,
+    samBox:`${who}: down/puller to you. Box at the leverage point and force the ball inside.`,
+    samSetEdge:`${who}: set the edge at the leverage point and force the ball inside.`,
+    samCoverage:`${who}: high hat off the ball. Step toward LOS, open, then gain depth away from LOS.`
+  }[r];
+}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function startGame(){order=shuffle(scenarios);current=0;correct=0;attempts=0;locked=false;document.getElementById("qTotal").textContent=order.length;document.getElementById("completeBox").style.display="none";loadScenario();}
+function restartGame(){startGame();window.scrollTo({top:0,behavior:"smooth"});}
+function loadScenario(){
+  locked=false;const s=order[current];clearField();
+  document.getElementById("qNum").textContent=current+1;
+  document.getElementById("frontTitle").textContent=s.front;
+  document.getElementById("strengthTitle").textContent=`${s.strength} — ${s.strength==="RIP"?"Strength Right":"Strength Left"}`;
+  document.getElementById("scenarioTitle").textContent=s.title;
+  document.getElementById("questionText").textContent=s.question;
+  document.getElementById("feedback").textContent="";document.getElementById("feedback").className="feedback";
+  updateAccuracy();drawOffense();s.front==="UNDER"?drawUnder(s.strength==="RIP"):drawOkie(s.strength==="RIP");drawLook(s);renderChoices(s);
+}
+function clearField(){[...field.querySelectorAll(".player,.tag,.read-label")].forEach(e=>e.remove());[...svg.querySelectorAll("path")].forEach(e=>e.remove());}
+function drawOffense(){addPlayer("X",205,215,"off");addPlayer("LT",390,260,"off");addPlayer("LG",470,260,"off");addPlayer("C",590,260,"off");addPlayer("RG",710,260,"off");addPlayer("RT",790,260,"off");addPlayer("Y",900,215,"off");addPlayer("QB",590,170,"off");addPlayer("RB",590,105,"off");}
+function drawUnder(rip){
+  if(rip){addPlayer("E",825,305,"def");label("5 strong",825,340,"tag");addPlayer("N",625,305,"def");label("shade strong",625,340,"tag");addPlayer("T",430,305,"def");label("3 weak",430,340,"tag");addPlayer("J",355,305,"def focus");label("5 weak",355,340,"tag");addPlayer("S",910,370,"def focus");label("off ball",910,407,"tag");}
+  else{addPlayer("E",355,305,"def");label("5 strong",355,340,"tag");addPlayer("N",555,305,"def");label("shade strong",555,340,"tag");addPlayer("T",750,305,"def");label("3 weak",750,340,"tag");addPlayer("J",825,305,"def focus");label("5 weak",825,340,"tag");addPlayer("S",270,370,"def focus");label("off ball",270,407,"tag");}
+  addPlayer("M",535,385,"def");addPlayer("W",645,385,"def");addPlayer("SS",360,485,"def");addPlayer("FS",820,485,"def");
+}
+function drawOkie(rip){
+  if(rip){addPlayer("E",825,305,"def");label("5 strong",825,340,"tag");addPlayer("N",625,305,"def");label("shade strong",625,340,"tag");addPlayer("T",430,305,"def");label("4i weak",430,340,"tag");addPlayer("J",270,370,"def focus");label("4 x 4",270,407,"tag");addPlayer("S",910,370,"def focus");label("4 x 4",910,407,"tag");}
+  else{addPlayer("E",355,305,"def");label("5 strong",355,340,"tag");addPlayer("N",555,305,"def");label("shade strong",555,340,"tag");addPlayer("T",750,305,"def");label("4i weak",750,340,"tag");addPlayer("J",910,370,"def focus");label("4 x 4",910,407,"tag");addPlayer("S",270,370,"def focus");label("4 x 4",270,407,"tag");}
+  addPlayer("M",535,385,"def");addPlayer("W",645,385,"def");addPlayer("SS",360,485,"def");addPlayer("FS",820,485,"def");
+}
+function P(s){
+  const rip=s.strength==="RIP";
+  if(rip)return{jackOT:{x:390,y:260,dir:-1,side:"left"},samOT:{x:790,y:260,dir:1,side:"right"},jack:{x:s.front==="UNDER"?355:270,y:s.front==="UNDER"?305:370},sam:{x:910,y:370},jackEdge:{x:350,y:255},samEdge:{x:875,y:255},jackInside:{x:455,y:330},samInside:{x:785,y:330},weakBall:{x:405,y:165},strongBall:{x:780,y:165}};
+  return{jackOT:{x:790,y:260,dir:1,side:"right"},samOT:{x:390,y:260,dir:-1,side:"left"},jack:{x:s.front==="UNDER"?825:910,y:s.front==="UNDER"?305:370},sam:{x:270,y:370},jackEdge:{x:830,y:255},samEdge:{x:305,y:255},jackInside:{x:725,y:330},samInside:{x:395,y:330},weakBall:{x:775,y:165},strongBall:{x:405,y:165}};
+}
+function drawLook(s){
+  const p=P(s);drawBlockAt(p.jackOT,s.jackBlock,"Jack key: "+s.jackBlock);drawBlockAt(p.samOT,s.samBlock,"Sam key: "+s.samBlock);
+  if(s.flow==="weak"){path(590,105,p.weakBall.x,p.weakBall.y,"ball-line");label("Flow weak / toward Jack",p.weakBall.x,p.weakBall.y-24,"read-label");}
+  if(s.flow==="strong"){path(590,105,p.strongBall.x,p.strongBall.y,"ball-line");label("Flow strong / toward Sam",p.strongBall.x,p.strongBall.y-24,"read-label");}
+  if(s.flow==="pass"){path(590,105,590,175,"ball-line");label("Pass set / high hat",590,205,"read-label");}
+  if(s.mesh==="pull"){path(590,170,p.weakBall.x+55,p.weakBall.y+55,"mesh-line");label("QB pull threat",p.weakBall.x+70,p.weakBall.y+75,"read-label");}
+  if(s.mesh==="give"){label("RB give declared",590,82,"read-label");}
+  if(s.mesh==="keep"){path(590,170,p.strongBall.x-45,p.strongBall.y+55,"mesh-line");label("QB keep/read phase",p.strongBall.x-35,p.strongBall.y+75,"read-label");}
+  if(s.mesh==="boot"){path(590,170,p.weakBall.x,p.weakBall.y+70,"mesh-line");label("Boot / reverse alert",p.weakBall.x,p.weakBall.y+95,"read-label");}
+}
+function drawBlockAt(key,block,text){
+  const d=key.dir;
+  if(block==="Down + Puller"){path(key.x,key.y,key.x-d*72,key.y+10,"block-line");drawPull(key.side);}
+  if(block==="Down — No Puller")path(key.x,key.y,key.x-d*75,key.y+10,"block-line");
+  if(block==="Zone")path(key.x,key.y,key.x+d*58,key.y-8,"block-line");
+  if(block==="Zone Away")path(key.x,key.y,key.x-d*55,key.y-6,"block-line");
+  if(block==="Base / Out")path(key.x,key.y,key.x+d*68,key.y+4,"block-line");
+  if(block==="Pull Away")path(key.x,key.y,key.x-d*130,key.y+18,"block-line");
+  if(block==="High Hat")path(key.x,key.y,key.x,key.y-62,"block-line");
+  if(block==="Base / Gap-Hinge"){path(key.x,key.y,key.x+d*45,key.y+4,"block-line");path(key.x+d*45,key.y+4,key.x+d*78,key.y+28,"block-line");}
+  label(text,key.x+d*88,key.y-34,"read-label");
+}
+function drawPull(side){const y=238;if(side==="left"){path(710,260,710,y,"block-line");path(710,y,525,y,"block-line");path(525,y,330,y,"block-line");label("Backside guard pulls flat behind LOS",525,y-18,"read-label");}else{path(470,260,470,y,"block-line");path(470,y,655,y,"block-line");path(655,y,850,y,"block-line");label("Backside guard pulls flat behind LOS",655,y-18,"read-label");}}
+function renderChoices(s){
+  const box=document.getElementById("choices");box.innerHTML="";
+  const choices=shuffle([s.correct,"Jack: chase the give now | Sam: drop straight back","Jack: widen outside TE | Sam: run over top","Jack: wrong-arm every look | Sam: blitz C-gap"]);
+  choices.forEach(choice=>{const b=document.createElement("button");b.textContent=choice;b.onclick=()=>submitAnswer(choice,s);box.appendChild(b);});
+}
+function submitAnswer(choice,s){
+  if(locked)return;attempts++;
+  if(choice!==s.correct){document.getElementById("feedback").className="feedback incorrect";document.getElementById("feedback").textContent="Not yet. Option football punishes guessing. Read block + mesh + responsibility.";updateAccuracy();return;}
+  locked=true;correct++;[...document.querySelectorAll("#choices button")].forEach(b=>b.disabled=true);
+  drawReactions(s);const fb=document.getElementById("feedback");fb.className="feedback correct";fb.textContent=`${s.why} ${explain(s.jackReaction,"Jack")} ${explain(s.samReaction,"Sam")}`;updateAccuracy();
+  setTimeout(()=>{current++;if(current>=order.length)endGame();else loadScenario();},7500);
+}
+function drawReactions(s){const p=P(s);drawReaction("jack",p,s.jackReaction);drawReaction("sam",p,s.samReaction);}
+function drawReaction(who,p,r){
+  const isJ=who==="jack",cls=isJ?"jack-line draw":"sam-line draw",name=isJ?"Jack":"Sam",start=isJ?p.jack:p.sam,edge=isJ?p.jackEdge:p.samEdge,inside=isJ?p.jackInside:p.samInside,toCenter=start.x>590?-1:1;
+  if(r==="jackQB"){path(start.x,start.y,edge.x,edge.y,cls);path(edge.x,edge.y,edge.x+toCenter*36,edge.y-42,cls);label(`${name}: QB leverage`,edge.x,edge.y-60,"read-label");}
+  if(r==="jackRush"){path(start.x,start.y,edge.x,edge.y,cls);path(edge.x,edge.y,edge.x+toCenter*28,edge.y-72,cls);label(`${name}: contain rush`,edge.x,edge.y-92,"read-label");}
+  if(r==="jackSpill"){const y=282,x=edge.x<590?430:750;path(start.x,start.y,x,y,cls);path(x,y,x,220,cls);label(`${name}: spill → vertical B`,x,204,"read-label");}
+  if(r==="jackBoxQB"){path(start.x,start.y,edge.x,edge.y,cls);path(edge.x,edge.y,edge.x+toCenter*45,edge.y-35,cls);label(`${name}: box / QB point`,edge.x,edge.y-55,"read-label");}
+  if(r==="jackLate"){path(start.x,start.y,start.x+toCenter*20,start.y-30,cls);label(`${name}: hold late contain`,start.x+toCenter*38,start.y-55,"read-label");}
+  if(r==="jackSetEdge"){path(start.x,start.y,edge.x,edge.y,cls);label(`${name}: set edge`,edge.x,edge.y-30,"read-label");}
+  if(r==="jackCoverage"){path(start.x,start.y,edge.x,edge.y,cls);path(edge.x,edge.y,edge.x-toCenter*48,edge.y+72,cls);label(`${name}: step LOS → coverage`,edge.x,edge.y+92,"read-label");}
+
+  if(r==="samCutback"){path(start.x,start.y,start.x+toCenter*52,start.y-10,cls);path(start.x+toCenter*52,start.y-10,inside.x,inside.y,cls);label(`${name}: inside cutback`,inside.x,inside.y-28,"read-label");}
+  if(r==="samBounce"){path(start.x,start.y,edge.x,edge.y,cls);path(edge.x,edge.y,inside.x,inside.y,cls);label(`${name}: bounce → B cutback`,inside.x,inside.y-28,"read-label");}
+  if(r==="samBox"){path(start.x,start.y,edge.x,edge.y,cls);label(`${name}: box leverage point`,edge.x,edge.y-30,"read-label");}
+  if(r==="samSetEdge"){path(start.x,start.y,edge.x,edge.y,cls);label(`${name}: set edge`,edge.x,edge.y-30,"read-label");}
+  if(r==="samCoverage"){path(start.x,start.y,edge.x,edge.y,cls);path(edge.x,edge.y,edge.x-toCenter*48,edge.y+72,cls);label(`${name}: step LOS → coverage`,edge.x,edge.y+92,"read-label");}
+}
+function updateAccuracy(){document.getElementById("accuracy").textContent=attempts===0?100:Math.round((correct/attempts)*100);}
+function endGame(){document.getElementById("completeBox").style.display="block";document.getElementById("finalScore").textContent=`Final Accuracy: ${Math.round((correct/attempts)*100)}%`;}
+function addPlayer(t,x,y,c){const e=document.createElement("div");e.className="player "+c;e.style.left=x+"px";e.style.top=y+"px";e.textContent=t;field.appendChild(e);}
+function label(t,x,y,c){const e=document.createElement("div");e.className=c;e.style.left=x+"px";e.style.top=y+"px";e.textContent=t;field.appendChild(e);}
+function path(x1,y1,x2,y2,c){const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d",`M ${x1} ${y1} L ${x2} ${y2}`);p.setAttribute("class",c);svg.appendChild(p);}
+startGame();
+</script>
+</body>
+</html>
